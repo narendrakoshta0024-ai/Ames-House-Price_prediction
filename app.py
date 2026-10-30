@@ -18,12 +18,6 @@ METRICS_PATH = BASE_DIR / "model_metrics.json"
 with open(METRICS_PATH, "r") as file:
     metrics = json.load(file)
 
-# Load dataset to create a complete feature row
-DATA_PATH = BASE_DIR / "data" / "train.csv"
-df = pd.read_csv(DATA_PATH)
-
-# Keep all input features; remove the target column
-X_sample = df.drop(columns=["SalePrice"]).iloc[[0]].copy()
 
 # Features available in our form
 FEATURES = [
