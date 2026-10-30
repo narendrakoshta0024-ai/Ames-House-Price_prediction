@@ -1,0 +1,522 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Ames House Price Predictor</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 30px 16px;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 650px;
+            margin: auto;
+            padding: 30px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 8px;
+            color: #1d4ed8;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 28px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        input:focus {
+            outline: 2px solid #93c5fd;
+            border-color: #2563eb;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 25px;
+            padding: 14px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .result {
+            margin-top: 25px;
+            padding: 20px;
+            text-align: center;
+            background: #eff6ff;
+            border-radius: 10px;
+        }
+
+        .result h2 {
+            color: #1d4ed8;
+            overflow-wrap: anywhere;
+        }
+
+        .error {
+            margin-top: 20px;
+            color: #b91c1c;
+            background: #fef2f2;
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .note {
+            margin-top: 22px;
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: white;
+            font-size: 16px;
+        }
+        .metrics-section {
+                margin-top: 30px;
+            }
+
+            .metrics-section h2 {
+                text-align: center;
+                font-size: 22px;
+            }
+
+            .metrics-grid {
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 12px;
+            }
+
+            .metric-card {
+                padding: 15px 8px;
+                text-align: center;
+                background: #f8fafc;
+                border: 1px solid #e2e8f0;
+                border-radius: 10px;
+                overflow-wrap: anywhere;
+            }
+
+            .metric-card p {
+                color: #64748b;
+                font-weight: bold;
+            }
+
+            .metric-card h3 {
+                font-size: 18px;
+                color: #1d4ed8;
+            }
+
+            .metric-card small {
+                color: #64748b;
+            }
+
+
+            .prediction-result {
+                margin-top: 30px;
+                padding: 25px;
+                background: #eff6ff;
+                border: 1px solid #bfdbfe;
+                border-radius: 14px;
+                text-align: center;
+            }
+
+            .result-icon {
+                font-size: 38px;
+            }
+
+            .result-label {
+                color: #475569;
+                font-weight: bold;
+                margin-bottom: 5px;
+            }
+
+            .prediction-result > h2 {
+                color: #1d4ed8;
+                font-size: 32px;
+                margin: 10px 0;
+                overflow-wrap: anywhere;
+            }
+
+            .result-description {
+                color: #64748b;
+            }
+
+            .result-divider {
+                height: 1px;
+                background: #bfdbfe;
+                margin: 25px 0;
+            }
+
+            .prediction-result h3 {
+                text-align: left;
+                margin-bottom: 15px;
+            }
+
+            .details-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+                text-align: left;
+            }
+
+            .detail-item {
+                padding: 12px;
+                background: white;
+                border-radius: 8px;
+                border: 1px solid #dbeafe;
+                min-width: 0;
+            }
+
+            .detail-item span {
+                display: block;
+                font-size: 13px;
+                color: #64748b;
+                margin-bottom: 6px;
+            }
+
+            .detail-item strong {
+                overflow-wrap: anywhere;
+            }
+
+            .result-disclaimer {
+                margin-top: 22px;
+                font-size: 12px;
+                color: #64748b;
+                line-height: 1.5;
+            }
+
+            @media (max-width: 480px) {
+                .details-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+
+            @media (max-width: 480px) {
+                .metrics-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+        @media (max-width: 480px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 22px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <h1>🏠 House Price Predictor</h1>
+
+        <p class="subtitle">
+            Enter house details to estimate its price
+        </p>
+
+        <form action="/" method="POST">
+
+            <div class="form-grid">
+
+                <div>
+                    <label for="OverallQual">
+                        Overall Quality (1–10)
+                    </label>
+                    <input
+                        type="number"
+                        id="OverallQual"
+                        name="OverallQual"
+                        min="1"
+                        max="10"
+                        value="{{ values.OverallQual }}"
+                        required
+                    >
+                </div>
+
+                <div>
+                    <label for="GrLivArea">
+                        Living Area (sq ft)
+                    </label>
+                    <input
+                        type="number"
+                        id="GrLivArea"
+                        name="GrLivArea"
+                        min="334"
+                        max="5642"
+                        value="{{ values.GrLivArea }}"
+                        required
+                    >
+                </div>
+
+                <div>
+                    <label for="YearBuilt">
+                        Year Built
+                    </label>
+                    <input
+                        type="number"
+                        id="YearBuilt"
+                        name="YearBuilt"
+                        min="1872"
+                        max="2010"
+                        value="{{ values.YearBuilt }}"
+                        required
+                    >
+                </div>
+
+                <div>
+                    <label for="GarageCars">
+                        Garage Capacity (cars)
+                    </label>
+                    <input
+                        type="number"
+                        id="GarageCars"
+                        name="GarageCars"
+                        min="0"
+                        max="4"
+                        value="{{ values.GarageCars }}"
+                        required
+                    >
+                </div>
+
+                <div>
+                    <label for="TotalBsmtSF">
+                        Basement Area (sq ft)
+                    </label>
+                    <input
+                        type="number"
+                        id="TotalBsmtSF"
+                        name="TotalBsmtSF"
+                        min="0"
+                        max="6110"
+                        value="{{ values.TotalBsmtSF }}"
+                        required
+                    >
+                </div>
+
+                <div>
+                    <label for="BedroomAbvGr">
+                        Bedrooms Above Ground
+                    </label>
+                    <input
+                        type="number"
+                        id="BedroomAbvGr"
+                        name="BedroomAbvGr"
+                        min="0"
+                        max="8"
+                        value="{{ values.BedroomAbvGr }}"
+                        required
+                    >
+                </div>
+
+                
+                <div>
+                    <label for="Neighborhood">
+                        Neighborhood
+                    </label>
+
+                    <select 
+                    id="Neighborhood" 
+                    name="Neighborhood" 
+                    required>
+                        {% for option in neighborhood_options %}
+                            <option
+                                value="{{ option }}"
+                                {% if option == values.Neighborhood %}selected{% endif %}
+                            >
+                                {{ option }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="KitchenQual">
+                        Kitchen Quality
+                    </label>
+
+                    <select id="KitchenQual" name="KitchenQual" required>
+                        {% for option in kitchen_options %}
+                            <option
+                                value="{{ option }}"
+                                {% if option == values.KitchenQual %}selected{% endif %}
+                            >
+                                {{ option }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+
+            </div>
+
+            <button type="submit">
+                Predict House Price
+            </button>
+
+        </form>
+
+
+        {% if prediction is not none %}
+
+        <div class="prediction-result">
+
+            <div class="result-icon">🏠</div>
+
+            <p class="result-label">Estimated House Price</p>
+
+            <h2>{{ prediction }}</h2>
+
+            <p class="result-description">
+                Your house price prediction is ready!
+            </p>
+
+            <div class="result-divider"></div>
+
+            <h3>House Details</h3>
+
+            <div class="details-grid">
+
+                <div class="detail-item">
+                    <span>Overall Quality</span>
+                    <strong>{{ values.OverallQual }}/10</strong>
+                </div>
+
+                <div class="detail-item">
+                    <span>Living Area</span>
+                    <strong>{{ values.GrLivArea }} sq ft</strong>
+                </div>
+
+                <div class="detail-item">
+                    <span>Year Built</span>
+                    <strong>{{ values.YearBuilt }}</strong>
+                </div>
+
+                <div class="detail-item">
+                    <span>Garage Capacity</span>
+                    <strong>{{ values.GarageCars }} cars</strong>
+                </div>
+
+                <div class="detail-item">
+                    <span>Basement Area</span>
+                    <strong>{{ values.TotalBsmtSF }} sq ft</strong>
+                </div>
+
+                <div class="detail-item">
+                    <span>Bedrooms</span>
+                    <strong>{{ values.BedroomAbvGr }}</strong>
+                </div>
+
+                <div class="detail-item">
+                    <span>Neighborhood</span>
+                    <strong>{{ values.Neighborhood }}</strong>
+                </div>
+
+                <div class="detail-item">
+                    <span>Kitchen Quality</span>
+                    <strong>{{ values.KitchenQual }}</strong>
+                </div>
+
+            </div>
+
+            <p class="result-disclaimer">
+                This is an estimated price generated by a machine
+                learning model. It is not a guaranteed market value.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+
+        {% if error %}
+            <div class="error">
+                {{ error }}
+            </div>
+        {% endif %}
+
+        <section class="metrics-section">
+            <h2>Model Performance</h2>
+
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <p>MAE</p>
+                    <h3>${{ "{:,.2f}".format(metrics.mae) }}</h3>
+                    <small>Mean Absolute Error</small>
+                </div>
+
+                <div class="metric-card">
+                    <p>RMSE</p>
+                    <h3>${{ "{:,.2f}".format(metrics.rmse) }}</h3>
+                    <small>Root Mean Squared Error</small>
+                </div>
+
+                <div class="metric-card">
+                    <p>R² Score</p>
+                    <h3>{{ "%.4f"|format(metrics.r2) }}</h3>
+                    <small>Test-set score</small>
+                </div>
+            </div>
+        </section>
+
+
+        <p class="note">
+            Note: This is a learning prototype. Only six features are
+            customized; remaining features use a sample dataset row.
+            Predictions may not represent actual market prices.
+        </p>
+
+    </div>
+</body>
+</html>
